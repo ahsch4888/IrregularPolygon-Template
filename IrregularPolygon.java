@@ -16,25 +16,33 @@ public class IrregularPolygon {
         myPolygon.add(aPoint);
     }
 
+    // Calculate perimeter by adding together the sum of the distance between one
+    // point and the next
     public double perimeter() {
         double sum = 0;
-        for (int i = 0; i < myPolygon.size()-1; i++) {
-            sum += myPolygon.get(i).distance(myPolygon.get(i+1));
+        for (int i = 0; i < myPolygon.size() - 1; i++) {
+            sum += myPolygon.get(i).distance(myPolygon.get(i + 1));
         }
-        sum += myPolygon.get(myPolygon.size()-1).distance(myPolygon.get(0));
+        sum += myPolygon.get(myPolygon.size() - 1).distance(myPolygon.get(0));
         return sum;
     }
 
+    // Calculate area using shoelace formula
+    // In this case, I condense (+ X0*Y1 - Y0*X1) into one line because they use the same
+    // i and i+1 values - no need to run through the ArrayList again
     public double area() {
         double sum = 0;
-        for (int i = 0; i < myPolygon.size()-1; i++) {
-            sum += myPolygon.get(i).getX() * myPolygon.get(i+1).getY();
-            sum -= myPolygon.get(i).getY() * myPolygon.get(i+1).getX();
+        for (int i = 0; i < myPolygon.size() - 1; i++) {
+            sum += sum(myPolygon, i, i + 1);
         }
-        sum += myPolygon.get(myPolygon.size()-1).getX() * myPolygon.get(0).getY();
-        sum -= myPolygon.get(myPolygon.size()-1).getY() * myPolygon.get(0).getX();
+        sum += sum(myPolygon, myPolygon.size() - 1, 0);
         sum /= 2;
         return Math.abs(sum);
+    }
+
+    // Use method for repeated code to condense
+    public double sum(ArrayList<Point2D.Double> polygon, int a, int b) {
+        return (polygon.get(a).getX() * polygon.get(b).getY()) - (polygon.get(a).getY() * polygon.get(b).getX());
     }
 
     public void draw() {
@@ -45,13 +53,14 @@ public class IrregularPolygon {
             // Documents: https://pavao.org/compsci/gpdraw/html/gpdraw/DrawingTool.html
             DrawingTool pen = new DrawingTool(new SketchPad(500, 500));
             pen.up();
-            
+
             for (Point2D.Double point : myPolygon) {
                 pen.move(point.getX(), point.getY());
                 pen.down();
             }
             pen.move(myPolygon.get(0).getX(), myPolygon.get(0).getY());
-            
+            pen.up();
+
         } catch (java.awt.HeadlessException e) {
             System.out.println("Exception: No graphics support available.");
         }
